@@ -27,9 +27,9 @@ function BilingualButton({ href, primary, secondary, variant }: BilingualButtonP
 }
 
 const STEPS = [
-  { step: '1', title: 'Browse free', desc: 'Bina login catalog dekho — cement, TMT, sand, sab kuch.' },
-  { step: '2', title: 'Cart banao', desc: 'Pasand ka maal cart mein daalo. Checkout par account chahiye.' },
-  { step: '3', title: 'Order & pay', desc: 'Login karo, UPI/card se pay karo, order track karo.' },
+  { step: '1', title: 'Browse free', desc: 'See cement, TMT, sand, and more — no login needed.' },
+  { step: '2', title: 'Add to cart', desc: 'Pick what you need. You will need an account at checkout.' },
+  { step: '3', title: 'Order & pay', desc: 'Sign in, pay by UPI or card, and track your order.' },
 ];
 
 export default function Home() {
@@ -43,7 +43,7 @@ export default function Home() {
             <div>
               <p className="tag bg-rebar-600 text-white mb-5">Bihar · Pincode-matched supply</p>
               <h1 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] mb-6">
-                CEMENT, TMT, SAND — ORDERED LIKE FOOD.
+                BUILDING MATERIAL, ORDERED DIRECT.
               </h1>
               <p className="text-concrete-200 text-lg mb-8 max-w-md leading-relaxed">
                 Buniyaad connects thekedar, builders, tender contractors, and ghar owners
@@ -82,7 +82,7 @@ export default function Home() {
 
         <section className="max-w-6xl mx-auto px-4 py-16 md:py-20">
           <p className="section-label">How it works</p>
-          <h2 className="page-title mb-10">3 STEPS. ORDER HO GAYA.</h2>
+          <h2 className="page-title mb-10">THREE SIMPLE STEPS</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {STEPS.map((s) => (
               <div key={s.step} className="card p-6 relative">
@@ -103,7 +103,7 @@ export default function Home() {
                 <p className="tag bg-steel-500 text-white mb-4">Products</p>
                 <h3 className="font-semibold text-xl mb-2">Browse by material</h3>
                 <p className="text-graphite-600 text-sm leading-relaxed mb-4">
-                  Cement, TMT, sand — category se filter karein, cart mein daalein.
+                  Filter by category — cement, TMT, sand — and add to your cart.
                 </p>
                 <Link href="/catalog" className="text-sm font-semibold text-steel-600 hover:text-rebar-600 transition-colors">
                   Browse products →
@@ -113,7 +113,7 @@ export default function Home() {
                 <p className="tag bg-rebar-500 text-white mb-4">Sellers</p>
                 <h3 className="font-semibold text-xl mb-2">Browse by shop</h3>
                 <p className="text-graphite-600 text-sm leading-relaxed mb-4">
-                  Zomato jaisa — pehle dukan dekho, verified dealer, phir unka maal order karo.
+                  Find verified dealers near you and order from their shop.
                 </p>
                 <Link href="/sellers" className="text-sm font-semibold text-rebar-600 hover:text-rebar-700 transition-colors">
                   Browse sellers →

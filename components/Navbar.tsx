@@ -78,10 +78,12 @@ export default function Navbar({
 
   const handleLogout = async () => {
     clearActiveRole();
-    await supabase.auth.signOut();
     setMenuOpen(false);
-    router.push('/');
-    router.refresh();
+    setLoggedIn(false);
+    setSessionRole(null);
+    setSwitchRole(null);
+    await supabase.auth.signOut();
+    router.replace('/');
   };
 
   const handleSwitchRole = (next: SessionRole) => {
@@ -135,6 +137,9 @@ export default function Navbar({
               {l.label}
             </Link>
           ))}
+          <Link href="/download" className="hover:text-rebar-500 transition-colors whitespace-nowrap">
+            App
+          </Link>
           {showCart ? <CartBadge /> : null}
           {switchRole ? (
             <button
@@ -153,6 +158,14 @@ export default function Navbar({
         </nav>
 
         <div className="flex items-center gap-3">
+          {links.length === 0 && !showCart ? (
+            <Link
+              href="/download"
+              className="md:hidden text-sm font-medium hover:text-rebar-500 transition-colors shrink-0"
+            >
+              App
+            </Link>
+          ) : null}
           {activeRole || loggedIn ? (
             <button type="button" onClick={handleLogout} className="text-sm font-medium hover:text-rebar-500">
               Log out
@@ -199,6 +212,13 @@ export default function Navbar({
               {l.label}
             </Link>
           ))}
+          <Link
+            href="/download"
+            onClick={() => setMenuOpen(false)}
+            className="py-2.5 text-sm font-medium hover:text-rebar-500 transition-colors"
+          >
+            App
+          </Link>
           {showCart ? (
             <Link
               href="/cart"

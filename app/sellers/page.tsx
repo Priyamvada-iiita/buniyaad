@@ -102,7 +102,7 @@ export default async function SellersPage({
         <div className="mb-6">
           <h1 className="page-title mb-1">BROWSE SELLERS</h1>
           <p className="text-graphite-600 text-sm">
-            Zomato jaisa — pehle dukan dekho, phir unka maal. Bina login browse karein.
+            Explore local shops and their products. No login needed to browse.
           </p>
         </div>
 

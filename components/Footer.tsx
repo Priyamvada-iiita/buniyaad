@@ -17,6 +17,7 @@ export default function Footer() {
           <div className="flex flex-col gap-2 text-sm">
             <Link href="/signup?role=buyer" className="hover:text-rebar-600 transition-colors">Create account</Link>
             <Link href="/buyer/catalog" className="hover:text-rebar-600 transition-colors">Browse catalog</Link>
+            <Link href="/download" className="hover:text-rebar-600 transition-colors">Get the app</Link>
           </div>
         </div>
         <div>

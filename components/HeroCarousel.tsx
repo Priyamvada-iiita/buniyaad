@@ -58,13 +58,13 @@ export const HERO_CAROUSEL_SLIDES: CarouselSlide[] = [
     subtitle: 'Browse everything — no login needed to start',
     href: '/catalog',
     cta: 'Browse catalog',
-    ctaHi: 'Saara maal dekho',
+    ctaHi: 'Poora catalog dekho',
   },
   {
     id: 'sellers',
     image: '/carousel/carousel-sellers.png',
     title: 'Browse sellers',
-    subtitle: 'Pehle dukan dekho — verified dealers across Bihar',
+    subtitle: 'Verified dealers and material shops across Bihar',
     href: '/sellers',
     cta: 'Browse sellers',
     ctaHi: 'Dukan / dealer dekho',
@@ -100,7 +100,8 @@ export default function HeroCarousel({ slides = HERO_CAROUSEL_SLIDES }: { slides
 
   return (
     <div
-      className="relative w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] rounded-xl overflow-hidden border border-graphite-700 shadow-2xl shadow-black/40 group"
+      className="relative w-full overflow-hidden rounded-xl border border-graphite-700 shadow-2xl shadow-black/40 group min-h-[240px] sm:min-h-[280px] md:min-h-[320px]"
+      style={{ aspectRatio: '4 / 3' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -109,7 +110,7 @@ export default function HeroCarousel({ slides = HERO_CAROUSEL_SLIDES }: { slides
       {slides.map((s, i) => (
         <div
           key={s.id}
-          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+          className={`absolute inset-0 overflow-hidden transition-opacity duration-700 ease-in-out ${
             i === index ? 'opacity-100 z-10' : 'opacity-0 z-0'
           }`}
           aria-hidden={i !== index}

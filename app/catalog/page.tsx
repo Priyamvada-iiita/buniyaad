@@ -80,7 +80,7 @@ export default async function CatalogPage({
           <div>
             <h1 className="page-title mb-1">BROWSE MATERIALS</h1>
             <p className="text-graphite-600 text-sm">
-              Bina login browse karein. Cart banane ke baad checkout ke liye account chahiye.
+              Browse materials without logging in. You will need an account to checkout.
             </p>
           </div>
         </div>

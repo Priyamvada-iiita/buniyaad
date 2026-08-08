@@ -1,0 +1,33 @@
+{
+  "name": "Buniyaad — Building Material",
+  "short_name": "Buniyaad",
+  "description": "Bihar ka building material marketplace. Cement, TMT, sand — seedha local dealer se.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1c1917",
+  "theme_color": "#b45309",
+  "lang": "en-IN",
+  "categories": ["shopping", "business"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
