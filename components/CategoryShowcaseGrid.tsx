@@ -4,12 +4,12 @@ import { CATEGORY_SHOWCASE } from '@/lib/category-showcase';
 
 export default function CategoryShowcaseGrid() {
   return (
-    <section className="mb-8">
-      <div className="text-center mb-6">
-        <p className="section-label">What you can order</p>
-        <h2 className="font-display text-2xl md:text-3xl">BUILDING MATERIALS ON YOUR PHONE</h2>
+    <section>
+      <div className="text-center mb-6 md:mb-8">
+        <p className="section-label">Shop by category</p>
+        <h2 className="page-title">BROWSE MATERIALS</h2>
         <p className="text-sm text-graphite-600 mt-2 max-w-lg mx-auto">
-          Cement, steel, sand, tiles, paint, plumbing, electrical — browse and order from local dealers across Bihar.
+          Tap a category to see products from local dealers across Bihar.
         </p>
       </div>
 

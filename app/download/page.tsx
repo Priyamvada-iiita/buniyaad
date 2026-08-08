@@ -1,4 +1,3 @@
-import CategoryShowcaseGrid from '@/components/CategoryShowcaseGrid';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
@@ -9,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Download Buniyaad App',
-  description: 'Install Buniyaad on your phone — cement, TMT, sand, tiles and more from local dealers.',
+  description: 'Install Buniyaad on your phone.',
 };
 
 export default function DownloadPage() {
@@ -22,87 +21,69 @@ export default function DownloadPage() {
     <>
       <Navbar shopping />
       <div className="min-h-screen flex flex-col bg-concrete-50 flex-1">
-        <main className="flex-1 max-w-6xl mx-auto px-4 py-8 md:py-12 w-full">
-          <div className="text-center mb-8 md:mb-10">
+        <main className="flex-1 max-w-2xl mx-auto px-4 py-10 w-full">
+          <div className="text-center mb-10">
             <img
               src="/icons/icon-192.png"
               alt="Buniyaad app icon"
-              className="h-20 w-20 md:h-24 md:w-24 rounded-2xl mx-auto mb-4 shadow-md"
+              className="h-24 w-24 rounded-2xl mx-auto mb-4 shadow-md"
             />
-            <h1 className="font-display text-3xl md:text-4xl mb-2">Get the Buniyaad app</h1>
-            <p className="text-graphite-600 max-w-xl mx-auto">
-              Bihar&apos;s building material marketplace — order cement, TMT, sand, tiles and more from your phone.
+            <h1 className="font-display text-3xl mb-2">Get the Buniyaad app</h1>
+            <p className="text-graphite-600">
+              Building material marketplace for Bihar — on your phone.
             </p>
           </div>
 
-          <CategoryShowcaseGrid />
-
-          <div className="grid md:grid-cols-3 gap-4 md:gap-6">
-            <section className="bg-white rounded-2xl border border-concrete-200 p-6">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rebar-50 text-rebar-600">
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                </span>
-                <h2 className="font-semibold text-lg">Install on phone</h2>
+          <section className="bg-white rounded-2xl border border-concrete-200 p-6 mb-6">
+            <h2 className="font-semibold text-lg mb-2">Install from browser</h2>
+            <p className="text-sm text-graphite-600 mb-4">
+              Works on Android and iPhone. No app store needed.
+            </p>
+            <div className="space-y-4 text-sm">
+              <div>
+                <p className="font-medium text-rebar-700 mb-1">Android (Chrome)</p>
+                <ol className="list-decimal list-inside text-graphite-600 space-y-1">
+                  <li>Open {siteHost} in Chrome</li>
+                  <li>Tap menu (⋮) → <strong>Add to Home screen</strong> or <strong>Install app</strong></li>
+                  <li>Confirm — Buniyaad appears on your home screen</li>
+                </ol>
               </div>
-              <p className="text-sm text-graphite-600 mb-4">Works on Android and iPhone — no app store needed.</p>
-              <div className="space-y-3 text-sm text-graphite-600">
-                <p>
-                  <strong className="text-graphite-800">Android:</strong> Open {siteHost} in Chrome → menu → Add to Home screen
+              <div>
+                <p className="font-medium text-rebar-700 mb-1">iPhone (Safari)</p>
+                <ol className="list-decimal list-inside text-graphite-600 space-y-1">
+                  <li>Open the site in Safari</li>
+                  <li>Tap Share → <strong>Add to Home Screen</strong></li>
+                </ol>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-2xl border border-concrete-200 p-6 mb-6">
+            <h2 className="font-semibold text-lg mb-2">Android APK</h2>
+            {apkAvailable ? (
+              <>
+                <p className="text-sm text-graphite-600 mb-4">
+                  Download and install directly on your Android phone.
                 </p>
-                <p>
-                  <strong className="text-graphite-800">iPhone:</strong> Open in Safari → Share → Add to Home Screen
-                </p>
-              </div>
-            </section>
+                <a
+                  href="/downloads/buniyaad.apk"
+                  download
+                  className="inline-flex items-center gap-2 rounded-xl bg-rebar-600 px-6 py-3 text-white font-semibold hover:bg-rebar-700 transition-colors"
+                >
+                  Download for Android
+                </a>
+              </>
+            ) : (
+              <p className="text-sm text-graphite-600">
+                Android APK download coming soon. You can install from your browser using the steps above.
+              </p>
+            )}
+          </section>
 
-            <section className="bg-white rounded-2xl border border-concrete-200 p-6">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rebar-50 text-rebar-600">
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                </span>
-                <h2 className="font-semibold text-lg">Android APK</h2>
-              </div>
-              {apkAvailable ? (
-                <>
-                  <p className="text-sm text-graphite-600 mb-4">Download and install directly on your Android phone.</p>
-                  <a
-                    href="/downloads/buniyaad.apk"
-                    download
-                    className="inline-flex items-center gap-2 rounded-xl bg-rebar-600 px-5 py-2.5 text-white text-sm font-semibold hover:bg-rebar-700 transition-colors"
-                  >
-                    Download APK
-                  </a>
-                </>
-              ) : (
-                <p className="text-sm text-graphite-600">
-                  Android APK download coming soon. Use install from browser above for now.
-                </p>
-              )}
-            </section>
-
-            <section className="bg-white rounded-2xl border border-concrete-200 p-6">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rebar-50 text-rebar-600">
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </span>
-                <h2 className="font-semibold text-lg">Play Store</h2>
-              </div>
-              <p className="text-sm text-graphite-600">Play Store download coming soon.</p>
-            </section>
-          </div>
-
-          <div className="mt-8 text-center">
-            <Link href="/catalog" className="btn-primary">
-              Browse materials on web
-            </Link>
-          </div>
+          <section className="bg-white rounded-2xl border border-concrete-200 p-6">
+            <h2 className="font-semibold text-lg mb-2">Play Store</h2>
+            <p className="text-sm text-graphite-600">Play Store download coming soon.</p>
+          </section>
         </main>
 
         <Footer />

@@ -46,8 +46,10 @@ The site is already a PWA once deployed with the manifest.
 
 **First launch in Android Studio Quail:**
 1. Open Android Studio → complete setup wizard
-2. **More Actions → SDK Manager** → install **Android SDK** and **Android SDK Build-Tools**
+2. **More Actions → SDK Manager** → install **Android SDK Platform 35** and **Build-Tools**
 3. Accept licenses when prompted
+
+**Java 25 note:** Android Studio Quail ships JDK 25. This project uses Gradle 8.14.4 (in `android/gradle/wrapper/`) which supports it. If build fails with `Unsupported class file major version 69`, make sure that Gradle version is in place.
 
 ### Steps
 

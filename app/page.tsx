@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import HeroCarousel from '@/components/HeroCarousel';
+import CategoryShowcaseGrid from '@/components/CategoryShowcaseGrid';
 
 type BilingualButtonProps = {
   href: string;
@@ -77,6 +78,12 @@ export default function Home() {
             </div>
 
             <HeroCarousel />
+          </div>
+        </section>
+
+        <section className="bg-white border-y border-concrete-200">
+          <div className="max-w-6xl mx-auto px-4 py-16 md:py-20">
+            <CategoryShowcaseGrid />
           </div>
         </section>
 
