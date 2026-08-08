@@ -6,6 +6,7 @@ import CatalogFilters from '@/components/CatalogFilters';
 import BrowseTabs from '@/components/BrowseTabs';
 import { sortProducts, type CatalogSort } from '@/lib/catalog';
 import { sellerDeliversToDistrict } from '@/lib/delivery-scope';
+import { fetchActiveProducts } from '@/lib/supabase/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,19 +54,10 @@ export default async function CatalogPage({
     }
   }
 
-  let dbQuery = supabase
-    .from('products')
-    .select(
-      '*, profiles!products_seller_id_fkey(business_name, verified, district, city, delivery_scope, delivery_districts), categories(name, parent_id)'
-    )
-    .eq('active', true);
-
-  if (categoryIds?.length) dbQuery = dbQuery.in('category_id', categoryIds);
-  if (queryText) dbQuery = dbQuery.ilike('name', `%${queryText}%`);
-
-  const { data: rawProducts } = await dbQuery;
-
-  let products = rawProducts ?? [];
+  let products = await fetchActiveProducts(supabase, {
+    categoryIds,
+    queryText: queryText || undefined,
+  });
   if (searchParams.district) {
     products = products.filter((p: any) => sellerDeliversToDistrict(p.profiles || {}, searchParams.district!));
   }

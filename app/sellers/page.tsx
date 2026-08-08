@@ -5,6 +5,7 @@ import SellerCard from '@/components/SellerCard';
 import SellerFilters from '@/components/SellerFilters';
 import { sortSellers, type SellerSort } from '@/lib/sellers';
 import { sellerDeliversToDistrict } from '@/lib/delivery-scope';
+import { fetchSellerRatings } from '@/lib/supabase/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,14 +36,19 @@ export default async function SellersPage({
   if (searchParams.type) sellerQuery = sellerQuery.eq('account_type', searchParams.type);
   if (verifiedOnly) sellerQuery = sellerQuery.eq('verified', true);
 
-  const { data: rawSellers } = await sellerQuery;
+  const { data: rawSellers, error: sellersError } = await sellerQuery;
+  if (sellersError) {
+    console.error('[sellers]', sellersError.message);
+    throw new Error(sellersError.message);
+  }
 
-  const { data: activeProducts } = await supabase
+  const { data: activeProducts, error: productsError } = await supabase
     .from('products')
     .select('seller_id')
     .eq('active', true);
+  if (productsError) console.error('[sellers products]', productsError.message);
 
-  const { data: allRatings } = await supabase.from('seller_ratings').select('seller_id, rating');
+  const allRatings = await fetchSellerRatings(supabase);
 
   const countBySeller = new Map<string, number>();
   activeProducts?.forEach((p) => {

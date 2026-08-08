@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { sellerTypeLabel } from '@/lib/profile-types';
+import SafeExternalImage from '@/components/SafeExternalImage';
 import { parseShopPhotos, type AadhaarStatus } from '@/lib/seller-profile';
 import { sellerShopHref } from '@/lib/sellers';
 import { ShopMapFromProfile } from '@/components/ShopMapEmbed';
@@ -79,13 +79,13 @@ export default function SellerPublicView({
       <div className="card overflow-hidden mb-8">
         {cover ? (
           <div className="relative h-44 md:h-56 bg-concrete-200">
-            <Image src={cover} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 896px" />
+            <SafeExternalImage src={cover} alt="" fill className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
             <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6">
               <div className="flex items-end gap-4">
                 <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-xl overflow-hidden border-2 border-white shadow-lg shrink-0 bg-graphite-800">
                   {photos[1] || photos[0] ? (
-                    <Image src={photos[1] || photos[0]} alt="" fill className="object-cover" sizes="80px" />
+                    <SafeExternalImage src={photos[1] || photos[0]} alt="" fill className="object-cover" />
                   ) : (
                     <span className="flex h-full items-center justify-center text-white font-display text-xl">
                       {name.charAt(0)}
@@ -176,7 +176,7 @@ export default function SellerPublicView({
                     key={url}
                     className="relative h-28 w-36 md:h-32 md:w-44 shrink-0 rounded-xl overflow-hidden border border-concrete-200 snap-start"
                   >
-                    <Image src={url} alt="" fill className="object-cover" sizes="176px" />
+                    <SafeExternalImage src={url} alt="" fill className="object-cover" />
                   </div>
                 ))}
               </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import SafeExternalImage from '@/components/SafeExternalImage';
 import { parseProductIds, type SellerOffer } from '@/lib/shop-social';
 
 type ProductMini = { id: string; name: string; price: number; unit: string; image_url: string | null };
@@ -47,7 +47,7 @@ export default function SellerOffersShowcase({
           >
             {offer.image_url ? (
               <div className="relative h-32 bg-concrete-100">
-                <Image src={offer.image_url} alt="" fill className="object-cover" sizes="400px" />
+                <SafeExternalImage src={offer.image_url} alt="" fill className="object-cover" />
                 {offer.badge_text ? (
                   <span className="absolute top-3 left-3 tag bg-rebar-600 text-white shadow">{offer.badge_text}</span>
                 ) : null}
