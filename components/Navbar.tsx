@@ -124,6 +124,18 @@ export default function Navbar({
       ? { primary: 'Switch to seller', secondary: 'Material bechna' }
       : { primary: 'Switch to buyer', secondary: 'Material kharidna' };
 
+  const downloadLink = (
+    <Link
+      href="/download"
+      className="inline-flex items-center gap-1.5 rounded-md border border-rebar-500/60 bg-rebar-600/15 px-3 py-1.5 text-sm font-semibold text-rebar-300 hover:bg-rebar-600/25 hover:text-rebar-200 transition-colors whitespace-nowrap"
+    >
+      <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+      Get the app
+    </Link>
+  );
+
   return (
     <header className="border-b border-graphite-800 bg-ink text-concrete-50 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -137,9 +149,7 @@ export default function Navbar({
               {l.label}
             </Link>
           ))}
-          <Link href="/download" className="hover:text-rebar-500 transition-colors whitespace-nowrap">
-            App
-          </Link>
+          {downloadLink}
           {showCart ? <CartBadge /> : null}
           {switchRole ? (
             <button
@@ -157,15 +167,8 @@ export default function Navbar({
           ) : null}
         </nav>
 
-        <div className="flex items-center gap-3">
-          {links.length === 0 && !showCart ? (
-            <Link
-              href="/download"
-              className="md:hidden text-sm font-medium hover:text-rebar-500 transition-colors shrink-0"
-            >
-              App
-            </Link>
-          ) : null}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="md:hidden shrink-0">{downloadLink}</div>
           {activeRole || loggedIn ? (
             <button type="button" onClick={handleLogout} className="text-sm font-medium hover:text-rebar-500">
               Log out
@@ -215,9 +218,9 @@ export default function Navbar({
           <Link
             href="/download"
             onClick={() => setMenuOpen(false)}
-            className="py-2.5 text-sm font-medium hover:text-rebar-500 transition-colors"
+            className="py-2.5 text-sm font-semibold text-rebar-400 hover:text-rebar-300 transition-colors"
           >
-            App
+            Get the app
           </Link>
           {showCart ? (
             <Link
