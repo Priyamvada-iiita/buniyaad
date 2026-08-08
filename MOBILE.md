@@ -1,119 +1,208 @@
-# Buniyaad mobile app — PWA & Android APK
+# Buniyaad mobile app — setup & build guide
 
-Two ways for users to get the app on their phone:
-
-1. **PWA (Progressive Web App)** — free, no store. Users tap "Add to Home screen" from Chrome/Safari.
-2. **Android APK** — free direct download. Wraps your live Vercel site in a native shell (Capacitor).
-
-Play Store is optional later ($25 one-time Google fee).
+This doc is the **source of truth** for how Buniyaad works on phones: PWA install, Android APK build, and what each file does. **Do not delete** `MOBILE.md`, `capacitor.config.ts`, or the Capacitor npm packages — they are required to rebuild the APK.
 
 ---
 
-## What’s already set up
+## Two ways users get the app
 
-- `public/manifest.webmanifest` — app name, icons, theme
-- `public/icons/` — 192×192 and 512×512 icons
-- `/download` page — install instructions + APK link
-- Install banner on the site (mobile)
-- `capacitor.config.ts` — points Android app at your production URL
+| Method | Cost | How |
+|--------|------|-----|
+| **PWA** | Free | Chrome/Safari → Add to Home screen |
+| **Android APK** | Free | Download from `/download` on the site |
 
-Set your live URL in `.env.local`:
+Play Store is optional later ($25 one-time Google fee). For MVP we ship a direct APK.
 
-```env
-NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
+---
+
+## How it works (architecture)
+
+```
+Website (Next.js on Vercel)
+        │
+        ├── PWA ── manifest + icons → user installs from browser
+        │
+        └── APK ── Capacitor WebView loads live Vercel URL
+                    (no embedded Next.js build inside the APK)
 ```
 
----
-
-## PWA (no build needed)
-
-After deploying to Vercel:
-
-1. Open the site on Android Chrome → menu → **Install app** / **Add to Home screen**
-2. On iPhone Safari → Share → **Add to Home Screen**
-
-The site is already a PWA once deployed with the manifest.
+**Key idea:** The APK is a thin native shell. It opens your **live website** in a WebView. When you push code to GitHub and Vercel redeploys, APK users see the update immediately — no new APK build needed for normal site changes.
 
 ---
 
-## Build Android APK (one-time on your PC)
+## Files you must keep (do not delete)
+
+| File / folder | Why |
+|---------------|-----|
+| `capacitor.config.ts` | Tells Capacitor the app ID, name, and **which URL** the APK loads. Without it, `npx cap sync` fails and you cannot rebuild the APK. |
+| `MOBILE.md` | This guide — setup steps for you or anyone cloning the repo. |
+| `@capacitor/*` in `package.json` | Capacitor runtime + CLI + Android platform package. |
+| `public/manifest.webmanifest` | PWA install metadata. |
+| `public/icons/` | PWA / APK launcher icons. |
+| `public/downloads/buniyaad.apk` | Pre-built APK users download from `/download`. |
+| `app/download/page.tsx` | Download / install instructions page. |
+| `lib/use-installed-app.ts` | Hides “Get the app” when user is already in PWA or APK. |
+
+**Why was `capacitor.config.ts` almost deleted?** During a disk-space cleanup, it was briefly removed by mistake. It was restored immediately. **Never remove it** — it is small (~20 lines) and essential for any APK rebuild.
+
+**`android/` folder:** Generated locally by `npx cap add android`. It is in `.gitignore` (large, machine-specific). You regenerate it on any PC that builds the APK. The **config** that matters is committed: `capacitor.config.ts`.
+
+---
+
+## What’s on the website (user-facing)
+
+- **Navbar → “Get the app”** — links to `/download` (hidden when already in PWA/APK via `useIsInstalledApp()`).
+- **`/download`** — install steps for Android/iPhone + APK download button when `buniyaad.apk` exists.
+- **Homepage category grid** — visual tiles linking to `/catalog?category=…` (separate from download page).
+- **Footer** — also hides “Get the app” inside the installed app shell.
+
+---
+
+## Environment variable
+
+Set in `.env.local` (and in Vercel project settings):
+
+```env
+NEXT_PUBLIC_APP_URL=https://buniyaad.vercel.app
+```
+
+Used by:
+- `capacitor.config.ts` → `server.url` for the APK WebView
+- Any absolute links that need the production domain
+
+Default fallback in config: `https://buniyaad.vercel.app`
+
+---
+
+## PWA (no APK build)
+
+After deploy to Vercel (HTTPS required):
+
+1. **Android Chrome** — menu → **Install app** / **Add to Home screen**
+2. **iPhone Safari** — Share → **Add to Home Screen**
+
+Already configured: `public/manifest.webmanifest`, icons, `theme-color` in layout.
+
+---
+
+## Build Android APK (Windows + Android Studio Quail 3)
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (already have)
-- [Android Studio](https://developer.android.com/studio) — you have **Quail 3 | 2026.1.3**
-- JDK 17 (bundled with Android Studio)
+- Node.js (already in project)
+- [Android Studio](https://developer.android.com/studio) — **Quail 3 | 2026.1.3** (or similar)
+- JDK bundled with Android Studio (Quail ships **Java 25**)
 
-**First launch in Android Studio Quail:**
-1. Open Android Studio → complete setup wizard
-2. **More Actions → SDK Manager** → install **Android SDK Platform 35** and **Build-Tools**
-3. Accept licenses when prompted
+**First-time Android Studio setup:**
 
-**Java 25 note:** Android Studio Quail ships JDK 25. This project uses Gradle 8.14.4 (in `android/gradle/wrapper/`) which supports it. If build fails with `Unsupported class file major version 69`, make sure that Gradle version is in place.
+1. Complete the setup wizard.
+2. **More Actions → SDK Manager** → install **Android SDK Platform 35** and **Build-Tools**.
+3. Accept SDK licenses when prompted.
 
-### Steps
+**Java 25 + Gradle:** Quail uses JDK 25. The local `android/` project uses **Gradle 8.14.4** (`android/gradle/wrapper/gradle-wrapper.properties`). If you see `Unsupported class file major version 69`, ensure that Gradle version is present after `npx cap add android` (re-copy from a backup or bump the wrapper URL to `gradle-8.14.4-all.zip`).
 
-```bash
-# 1. Install Capacitor (if not done)
-npm install @capacitor/core @capacitor/cli @capacitor/android
+### One-time: add Android platform
 
-# 2. Set production URL
-# In .env.local: NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
+```powershell
+cd C:\Users\divya\Downloads\buniyaad-mvp\buniyaad
 
-# 3. Add Android platform (first time only)
+npm install
+
+# First time only (creates android/ — gitignored)
 npx cap add android
+```
 
-# 4. Sync web assets + config into android/
+### Every APK rebuild
+
+```powershell
+# 1. Ensure .env.local has NEXT_PUBLIC_APP_URL
+
+# 2. Sync config into android/
 npx cap sync android
 
-# 5. Open in Android Studio
+# 3a. Build from command line (no Android Studio UI)
+cd android
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+.\gradlew.bat assembleDebug
+
+# 3b. Or open in Android Studio
+cd ..
 npx cap open android
+# Then: Build → Build Bundle(s) / APK(s) → Build APK(s)
 ```
 
-In **Android Studio**:
+### Copy APK to the website
 
-1. Wait for Gradle sync to finish
-2. **Build → Build Bundle(s) / APK(s) → Build APK(s)**
-3. APK path: `android/app/build/outputs/apk/debug/app-debug.apk`
+```powershell
+cd C:\Users\divya\Downloads\buniyaad-mvp\buniyaad
+New-Item -ItemType Directory -Force -Path public\downloads
+Copy-Item android\app\build\outputs\apk\debug\app-debug.apk public\downloads\buniyaad.apk
+```
 
-### Share the APK
+Then commit and push so Vercel serves the new APK from `/downloads/buniyaad.apk`.
 
-Copy the built APK to the site so users can download it:
+**When do you need a new APK?**
+
+| Change | New APK? |
+|--------|----------|
+| Website content, UI, API routes | No — live URL updates automatically |
+| App icon, app name, `appId` | Yes |
+| Capacitor / Android permissions | Yes |
+| Play Store release | Yes (signed AAB) |
+
+### Release APK (optional, for wider distribution)
+
+Android Studio → **Build → Generate Signed Bundle / APK** → create keystore (store safely) → release APK → copy to `public/downloads/buniyaad.apk`.
+
+---
+
+## `capacitor.config.ts` explained
+
+```ts
+appId: 'in.buniyaad.app'     // Android package name
+appName: 'Buniyaad'          // Launcher label
+webDir: 'public'             // Local static assets (icons, etc.)
+server.url: NEXT_PUBLIC_APP_URL  // Live site the WebView opens
+```
+
+- **`server.url`** — APK users always hit your Vercel deployment. This is why the APK stays small (~20 MB) and always up to date.
+- **`webDir: 'public'`** — Capacitor still needs a folder for native assets; we use `public/` (manifest, icons). The main UI is not bundled — it loads from the URL.
+- To ship a fully offline app later, you’d switch to a static export in `webDir` — not needed for MVP.
+
+---
+
+## Play Store (optional, later)
+
+Same `android/` project after Play Console signup ($25):
+
+1. Build signed **AAB** (Android App Bundle).
+2. Upload to Internal testing first.
+3. Add privacy policy URL.
+
+---
+
+## npm scripts
 
 ```bash
-mkdir -p public/downloads
-cp android/app/build/outputs/apk/debug/app-debug.apk public/downloads/buniyaad.apk
+npm run cap:sync    # npx cap sync android
+npm run cap:open    # open Android Studio
+npm run cap:android # npx cap add android && sync (first time on a new machine)
 ```
 
-Commit `public/downloads/buniyaad.apk` (or host on GitHub Releases / Google Drive and link from `/download`).
-
-For a **release** APK (smaller, signed for distribution):
-
-1. Android Studio → **Build → Generate Signed Bundle / APK**
-2. Create a keystore (keep it safe — needed for Play Store updates)
-3. Build release APK and copy to `public/downloads/buniyaad.apk`
-
 ---
 
-## Play Store (optional)
+## Local disk space (safe to delete)
 
-Same `android/` project. After $25 [Google Play Console](https://play.google.com/console) signup:
+These are **not** in git or are regenerable — OK to delete locally to save space:
 
-1. Build **signed AAB** (Android App Bundle) in Android Studio
-2. Upload to Play Console → Internal testing first
-3. Add privacy policy URL (your site `/` or a simple page)
+| Folder | Size (approx) | Notes |
+|--------|---------------|-------|
+| `.next/` | ~200+ MB | Dev/build cache — `npm run dev` recreates |
+| `node_modules/` | ~300 MB | `npm install` recreates |
+| `android/app/build/` | varies | Build output — `gradlew assembleDebug` recreates |
 
----
-
-## How the APK works
-
-Capacitor loads your **live Vercel URL** inside a WebView (`server.url` in `capacitor.config.ts`). That means:
-
-- No need to embed the whole Next.js build in the APK
-- Updates to the website appear in the app immediately
-- Requires internet (same as using the browser)
-
-To ship a fully offline app later, you’d change `webDir` to a static export — not needed for MVP.
+**Do not delete** `capacitor.config.ts`, `MOBILE.md`, `public/downloads/buniyaad.apk`, or Capacitor packages if you want to rebuild the APK.
 
 ---
 
@@ -121,17 +210,20 @@ To ship a fully offline app later, you’d change `webDir` to a static export �
 
 | Issue | Fix |
 |-------|-----|
-| APK shows blank screen | Check `NEXT_PUBLIC_APP_URL` matches your live Vercel URL |
-| “App not installed” on phone | Enable unknown sources; try debug APK first |
-| PWA install not offered | Use HTTPS; open in Chrome; visit site twice |
-| Capacitor sync fails | Run `npm run build` first if you add local web assets |
+| APK blank / white screen | Check `NEXT_PUBLIC_APP_URL` matches live Vercel URL; site must be HTTPS |
+| `Unsupported class file major version 69` | Use Gradle 8.14.4+ in `android/gradle/wrapper/gradle-wrapper.properties` |
+| `gradlew` / JAVA_HOME errors | Set `JAVA_HOME` to Android Studio `jbr` folder (see build steps) |
+| “App not installed” on phone | Allow install from unknown sources; use debug APK first |
+| PWA install not offered | HTTPS, Chrome, visit site twice |
+| `npx cap sync` fails | Ensure `capacitor.config.ts` exists; run `npm install` |
+| New clone, no `android/` | Run `npx cap add android` then `npx cap sync android` |
+| Homepage layout broken locally | Delete `.next` and `node_modules/.cache`, restart single `npm run dev` |
 
 ---
 
-## npm scripts
+## Deploy checklist (website + APK)
 
-```bash
-npm run cap:sync    # sync config to android/
-npm run cap:open    # open Android Studio
-npm run cap:android # add platform + sync (first time)
-```
+1. Push code to GitHub → Vercel auto-deploys.
+2. Confirm `NEXT_PUBLIC_APP_URL` in Vercel env matches deployment URL.
+3. Website users get updates immediately (browser + existing APK).
+4. Rebuild APK only when changing native shell (icon, app ID, Capacitor config).

@@ -1,6 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { useIsInstalledApp } from '@/lib/use-installed-app';
 
 export default function Footer() {
+  const isInstalledApp = useIsInstalledApp();
+
   return (
     <footer className="mt-auto border-t border-concrete-200 bg-white">
       <div className="max-w-6xl mx-auto px-4 py-10 grid sm:grid-cols-3 gap-8">
@@ -17,7 +22,9 @@ export default function Footer() {
           <div className="flex flex-col gap-2 text-sm">
             <Link href="/signup?role=buyer" className="hover:text-rebar-600 transition-colors">Create account</Link>
             <Link href="/buyer/catalog" className="hover:text-rebar-600 transition-colors">Browse catalog</Link>
-            <Link href="/download" className="hover:text-rebar-600 transition-colors">Get the app</Link>
+            {!isInstalledApp ? (
+              <Link href="/download" className="hover:text-rebar-600 transition-colors">Get the app</Link>
+            ) : null}
           </div>
         </div>
         <div>

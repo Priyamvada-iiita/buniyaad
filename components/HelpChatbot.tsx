@@ -10,9 +10,16 @@ type ChatMessage = {
   source?: string;
 };
 
+const MINIMIZED_KEY = 'buniyaad-help-minimized';
+
+function HelpBotIcon({ className = 'text-lg' }: { className?: string }) {
+  return <span className={className} aria-hidden>💬</span>;
+}
+
 export default function HelpChatbot() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [minimized, setMinimized] = useState(false);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [mode, setMode] = useState<'faq_only' | 'ollama_with_faq_fallback'>('faq_only');
@@ -29,6 +36,12 @@ export default function HelpChatbot() {
   const hidden = pathname?.startsWith('/internal/');
 
   useEffect(() => {
+    if (localStorage.getItem(MINIMIZED_KEY) === '1') {
+      setMinimized(true);
+    }
+  }, []);
+
+  useEffect(() => {
     fetch('/api/help-chat')
       .then((r) => r.json())
       .then((d) => setMode(d.mode || 'faq_only'))
@@ -38,6 +51,11 @@ export default function HelpChatbot() {
   useEffect(() => {
     if (open) bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, open]);
+
+  const setMinimizedPref = (value: boolean) => {
+    setMinimized(value);
+    localStorage.setItem(MINIMIZED_KEY, value ? '1' : '0');
+  };
 
   const send = async (text: string) => {
     const trimmed = text.trim();
@@ -93,14 +111,28 @@ export default function HelpChatbot() {
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="text-concrete-300 hover:text-white text-xl leading-none px-1 shrink-0"
-              aria-label="Close help chat"
-            >
-              ×
-            </button>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setMinimizedPref(true);
+                  setOpen(false);
+                }}
+                className="h-7 w-7 rounded-full text-concrete-300 hover:text-white hover:bg-graphite-700 flex items-center justify-center text-base leading-none"
+                aria-label="Minimize to icon"
+                title="Minimize"
+              >
+                −
+              </button>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="h-7 w-7 rounded-full text-concrete-300 hover:text-white hover:bg-graphite-700 flex items-center justify-center text-xl leading-none"
+                aria-label="Close help chat"
+              >
+                ×
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-concrete-50">
@@ -155,32 +187,65 @@ export default function HelpChatbot() {
             </button>
           </form>
         </div>
-      ) : (
+      ) : minimized ? (
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-4 z-[60] w-[min(calc(100vw-2rem),252px)] rounded-2xl border border-concrete-200 bg-white p-3.5 shadow-lg hover:shadow-xl hover:border-rebar-300 transition-all text-left flex gap-3 items-start group"
+          onDoubleClick={(e) => {
+            e.preventDefault();
+            setMinimizedPref(false);
+          }}
+          className="fixed bottom-5 right-4 z-[60] h-12 w-12 rounded-full bg-rebar-600 text-white shadow-lg hover:bg-rebar-700 hover:shadow-xl transition-all flex items-center justify-center"
           aria-label="Open Buniyaad help chat"
+          title="Tap for help · Double-tap to show full button"
         >
-          <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-rebar-600 text-white text-lg shadow-md">
-            💬
+          <span className="relative">
+            <HelpBotIcon />
             {mode === 'ollama_with_faq_fallback' ? (
               <span
-                className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-signal-green border-2 border-white"
+                className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-signal-green border-2 border-white"
                 title="AI enabled"
               />
             ) : null}
           </span>
-          <span className="min-w-0 pt-0.5">
-            <span className="block text-[13px] font-semibold text-ink leading-snug">How can I help you?</span>
-            <span className="block text-[11px] text-graphite-600 mt-1 leading-snug">
-              Ask questions — orders, payments, sellers…
-            </span>
-            <span className="block text-[11px] font-semibold text-rebar-600 mt-2 group-hover:underline">
-              Chat now →
-            </span>
-          </span>
         </button>
+      ) : (
+        <div className="fixed bottom-5 right-4 z-[60] w-[min(calc(100vw-2rem),252px)] rounded-2xl border border-concrete-200 bg-white shadow-lg overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setMinimizedPref(true)}
+            className="absolute top-2 right-2 z-10 h-7 w-7 rounded-full bg-concrete-100 text-graphite-600 hover:bg-concrete-200 hover:text-ink flex items-center justify-center text-sm leading-none"
+            aria-label="Minimize help chat to icon"
+            title="Minimize"
+          >
+            −
+          </button>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="w-full p-3.5 pr-10 hover:bg-concrete-50 transition-colors text-left flex gap-3 items-start group"
+            aria-label="Open Buniyaad help chat"
+          >
+            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-rebar-600 text-white text-lg shadow-md">
+              <HelpBotIcon />
+              {mode === 'ollama_with_faq_fallback' ? (
+                <span
+                  className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-signal-green border-2 border-white"
+                  title="AI enabled"
+                />
+              ) : null}
+            </span>
+            <span className="min-w-0 pt-0.5">
+              <span className="block text-[13px] font-semibold text-ink leading-snug">How can I help you?</span>
+              <span className="block text-[11px] text-graphite-600 mt-1 leading-snug">
+                Ask questions — orders, payments, sellers…
+              </span>
+              <span className="block text-[11px] font-semibold text-rebar-600 mt-2 group-hover:underline">
+                Chat now →
+              </span>
+            </span>
+          </button>
+        </div>
       )}
     </>
   );
