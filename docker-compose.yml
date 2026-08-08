@@ -1,0 +1,30 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        # Baked into the JS bundle at build time — browser reads these.
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_RAZORPAY_KEY_ID: ${NEXT_PUBLIC_RAZORPAY_KEY_ID}
+    ports:
+      - "3000:3000"
+    env_file:
+      # Server-only secrets (ADMIN_PATH, Razorpay secret, service role, OLLAMA_*) — runtime.
+      - .env.local
+    restart: unless-stopped
+
+  # Optional local LLM for help chatbot.
+  # Start with:  docker compose --profile ai up --build
+  # In .env.local set:  OLLAMA_BASE_URL=http://ollama:11434
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["ai"]
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
