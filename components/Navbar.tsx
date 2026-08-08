@@ -2,13 +2,34 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import BilingualLabel from '@/components/BilingualLabel';
 import CartBadge from '@/components/CartBadge';
 import { destinationForRole, getUserProfileRoles } from '@/lib/profiles';
-import { clearActiveRole, getActiveRole, setActiveRole, type SessionRole } from '@/lib/session-role';
+import {
+  clearActiveRole,
+  getActiveRole,
+  roleBadgeLabel,
+  setActiveRole,
+  type SessionRole,
+} from '@/lib/session-role';
 import { useIsInstalledApp } from '@/lib/use-installed-app';
+
+function RoleBadge({ role }: { role: SessionRole }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${
+        role === 'seller'
+          ? 'border-steel-400/50 bg-steel-500/15 text-steel-200'
+          : 'border-rebar-500/50 bg-rebar-600/20 text-rebar-200'
+      }`}
+      title={role === 'seller' ? 'Seller mode' : 'Buyer mode'}
+    >
+      {roleBadgeLabel(role)}
+    </span>
+  );
+}
 
 export default function Navbar({
   role,
@@ -20,11 +41,14 @@ export default function Navbar({
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
+  const pathnameRef = useRef(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
   const [switchRole, setSwitchRole] = useState<SessionRole | null>(null);
-  const [sessionRole, setSessionRole] = useState<SessionRole | null>(role ?? null);
+  const [sessionRole, setSessionRole] = useState<SessionRole | null>(() => role ?? getActiveRole());
   const [loggedIn, setLoggedIn] = useState(false);
   const isInstalledApp = useIsInstalledApp();
+
+  pathnameRef.current = pathname;
 
   useEffect(() => {
     if (role) setActiveRole(role);
@@ -40,37 +64,35 @@ export default function Navbar({
       return;
     }
 
-    const sync = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setLoggedIn(Boolean(user));
-      if (!user) {
-        setSessionRole(null);
-        setSwitchRole(null);
-        return;
-      }
+    let cancelled = false;
 
+    const applyRoles = async (userId: string) => {
       const stored = getActiveRole();
-      const roles = (await getUserProfileRoles(supabase, user.id)).filter(
+      if (stored) setSessionRole(stored);
+
+      const roles = (await getUserProfileRoles(supabase, userId)).filter(
         (r): r is SessionRole => r === 'buyer' || r === 'seller'
       );
+      if (cancelled) return;
 
-      if (roles.length >= 2 && !stored && shopping && pathname !== '/choose-role') {
-        router.replace(`/choose-role?next=${encodeURIComponent(pathname || '/catalog')}`);
+      const currentPath = pathnameRef.current;
+      if (roles.length >= 2 && !stored && shopping && currentPath !== '/choose-role') {
+        router.replace(`/choose-role?next=${encodeURIComponent(currentPath || '/catalog')}`);
         return;
       }
 
+      let active: SessionRole | null = null;
       if (stored && roles.includes(stored)) {
-        setSessionRole(stored);
+        active = stored;
       } else if (roles.length === 1) {
+        active = roles[0];
         setActiveRole(roles[0]);
-        setSessionRole(roles[0]);
-      } else {
-        setSessionRole(stored);
+      } else if (stored) {
+        active = stored;
       }
 
-      const active = stored && roles.includes(stored) ? stored : roles.length === 1 ? roles[0] : stored;
+      if (active) setSessionRole(active);
+
       if (active) {
         const other = active === 'buyer' ? 'seller' : 'buyer';
         setSwitchRole(roles.includes(other) ? other : null);
@@ -79,8 +101,29 @@ export default function Navbar({
       }
     };
 
-    sync();
-  }, [role, shopping, supabase, router, pathname]);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user;
+      setLoggedIn(Boolean(user));
+      if (!user) {
+        setSessionRole(null);
+        setSwitchRole(null);
+        return;
+      }
+      applyRoles(user.id);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setLoggedIn(Boolean(session?.user));
+      if (session?.user) applyRoles(session.user.id);
+    });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, [role, shopping, supabase, router]);
 
   const handleLogout = async () => {
     clearActiveRole();
@@ -95,9 +138,9 @@ export default function Navbar({
   const handleSwitchRole = (next: SessionRole) => {
     setActiveRole(next);
     setSessionRole(next);
+    setSwitchRole(next === 'buyer' ? 'seller' : 'buyer');
     setMenuOpen(false);
-    router.push(destinationForRole(next));
-    router.refresh();
+    router.replace(destinationForRole(next));
   };
 
   const activeRole = role || sessionRole;
@@ -146,9 +189,12 @@ export default function Navbar({
   return (
     <header className="border-b border-graphite-800 bg-ink text-concrete-50 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
-        <Link href="/" className="font-display text-base sm:text-lg tracking-tight text-white shrink-0 min-w-0">
-          BUNIYAAD<span className="text-rebar-500">.</span>
-        </Link>
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink">
+          <Link href="/" className="font-display text-base sm:text-lg tracking-tight text-white shrink-0">
+            BUNIYAAD<span className="text-rebar-500">.</span>
+          </Link>
+          {activeRole && isLoggedIn ? <RoleBadge role={activeRole} /> : null}
+        </div>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium min-w-0">
@@ -193,7 +239,7 @@ export default function Navbar({
           )}
         </div>
 
-        {/* Mobile: cart + menu only — keeps header stable */}
+        {/* Mobile: role chip + cart + menu */}
         <div className="flex md:hidden items-center gap-1 shrink-0">
           {showCart ? <CartBadge /> : null}
           <button
@@ -214,9 +260,16 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* Mobile menu — all links + CTAs live here */}
+      {/* Mobile menu */}
       {menuOpen && (
         <nav className="md:hidden border-t border-graphite-800 bg-graphite-800 px-4 py-3 flex flex-col gap-1 max-h-[70vh] overflow-y-auto">
+          {activeRole && isLoggedIn ? (
+            <div className="pb-2 mb-1 border-b border-graphite-700 flex items-center justify-between">
+              <span className="text-xs text-graphite-400">You&apos;re in</span>
+              <RoleBadge role={activeRole} />
+            </div>
+          ) : null}
+
           {links.map((l) => (
             <Link
               key={l.href}

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import Navbar from '@/components/Navbar';
 import BrowseTabs from '@/components/BrowseTabs';
 import SellerCard from '@/components/SellerCard';
+import SellerStrip from '@/components/SellerStrip';
 import SellerFilters from '@/components/SellerFilters';
 import { sortSellers, type SellerSort } from '@/lib/sellers';
 import { sellerDeliversToDistrict } from '@/lib/delivery-scope';
@@ -107,6 +108,8 @@ export default async function SellersPage({
         </div>
 
         <BrowseTabs active="sellers" />
+
+        {sellers.length > 0 ? <SellerStrip sellers={sellers} /> : null}
 
         <SellerFilters
           q={searchParams.q}

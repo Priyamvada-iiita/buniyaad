@@ -20,7 +20,6 @@ function LoginForm() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [pickRole, setPickRole] = useState<('buyer' | 'seller')[] | null>(null);
 
   const requestedRoleParam = params.get('role');
   const requestedRole =
@@ -30,17 +29,15 @@ function LoginForm() {
 
   const nextPath = safeNextPath(params.get('next'));
 
-  const finishLogin = (role: 'buyer' | 'seller') => {
+  const goAfterAuth = (role: 'buyer' | 'seller') => {
     setActiveRole(role);
-    router.push(nextPath || destinationForRole(role));
-    router.refresh();
+    router.replace(nextPath || destinationForRole(role));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setPickRole(null);
 
     const { data, error: signInError } = await supabase.auth.signInWithPassword(form);
     if (signInError || !data.user) {
@@ -50,8 +47,9 @@ function LoginForm() {
     }
 
     const roles = (await getUserProfileRoles(supabase, data.user.id)).filter(
-      (r) => r === 'buyer' || r === 'seller'
+      (r): r is 'buyer' | 'seller' => r === 'buyer' || r === 'seller'
     );
+
     if (!roles.length) {
       const allRoles = await getUserProfileRoles(supabase, data.user.id);
       setError(
@@ -64,17 +62,14 @@ function LoginForm() {
     }
 
     if (roles.length === 1) {
-      finishLogin(roles[0]);
+      goAfterAuth(roles[0]);
       return;
     }
 
-    // Both buyer + seller — always ask which mode to use
-    setPickRole(roles.filter((r) => r === 'buyer' || r === 'seller') as ('buyer' | 'seller')[]);
-    setLoading(false);
+    // Buyer + seller — dedicated picker page (faster than inline UI + no router.refresh)
+    const chooseNext = nextPath || '/catalog';
+    router.replace(`/choose-role?next=${encodeURIComponent(chooseNext)}`);
   };
-
-  const roleLabel = (role: 'buyer' | 'seller') =>
-    role === 'seller' ? 'Seller — Material bechna' : 'Buyer — Material kharidna';
 
   return (
     <>
@@ -90,55 +85,32 @@ function LoginForm() {
           ) : null}
         </p>
 
-        {pickRole ? (
-          <div className="space-y-3">
-            <p className="text-sm text-graphite-600 mb-4">
-              Is email par buyer aur seller dono accounts hain. Kaunsa open karna hai?
-            </p>
-            {pickRole.map((role) => (
-              <button
-                key={role}
-                type="button"
-                onClick={() => finishLogin(role)}
-                className="w-full text-left p-4 rounded-md border border-concrete-300 hover:border-rebar-600 hover:bg-rebar-50 transition-colors"
-              >
-                <span className="font-semibold block">{roleLabel(role)}</span>
-              </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => setPickRole(null)}
-              className="text-sm text-graphite-600 hover:text-rebar-600"
-            >
-              ← Back
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              required
-              type="email"
-              placeholder="Email"
-              className="input-field"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-            <input
-              required
-              type="password"
-              placeholder="Password"
-              className="input-field"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-            />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            required
+            type="email"
+            placeholder="Email"
+            className="input-field"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            disabled={loading}
+          />
+          <input
+            required
+            type="password"
+            placeholder="Password"
+            className="input-field"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            disabled={loading}
+          />
 
-            {error && <p className="text-signal-red text-sm">{error}</p>}
+          {error && <p className="text-signal-red text-sm">{error}</p>}
 
-            <button type="submit" disabled={loading} className="btn-primary w-full">
-              {loading ? 'Logging in…' : 'Log in'}
-            </button>
-          </form>
-        )}
+          <button type="submit" disabled={loading} className="btn-primary w-full">
+            {loading ? 'Logging in…' : 'Log in'}
+          </button>
+        </form>
 
         <p className="mt-6 text-center text-sm text-graphite-600">
           No account?{' '}

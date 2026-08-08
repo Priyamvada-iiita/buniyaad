@@ -24,3 +24,8 @@ export function clearActiveRole() {
 export function parseSessionRole(value: string | undefined | null): SessionRole | null {
   return value === 'buyer' || value === 'seller' ? value : null;
 }
+
+/** Short label for navbar / UI chips */
+export function roleBadgeLabel(role: SessionRole): string {
+  return role === 'seller' ? 'Selling' : 'Buying';
+}

@@ -199,8 +199,7 @@ function SignupForm() {
     }
 
     setActiveRole(role);
-    router.push(nextPath || destinationForRole(role));
-    router.refresh();
+    router.replace(nextPath || destinationForRole(role));
   };
 
   const set = (key: keyof FormState, value: string) => setForm({ ...form, [key]: value });

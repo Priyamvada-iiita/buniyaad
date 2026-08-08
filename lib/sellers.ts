@@ -35,6 +35,8 @@ export type SellerProfile = {
   pincode: string | null;
   address: string | null;
   verified: boolean;
+  shop_cover_url?: string | null;
+  shop_photo_urls?: unknown;
   delivery_scope?: string | null;
   delivery_districts?: string[] | null;
   product_count?: number;

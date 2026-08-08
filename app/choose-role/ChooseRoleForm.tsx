@@ -16,14 +16,16 @@ export default function ChooseRoleForm() {
   const supabase = createClient();
   const [roles, setRoles] = useState<('buyer' | 'seller')[]>([]);
   const [loading, setLoading] = useState(true);
+  const [picking, setPicking] = useState<'buyer' | 'seller' | null>(null);
 
   const nextPath = safeNextPath(params.get('next'));
 
   useEffect(() => {
     (async () => {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) {
         router.replace('/login');
         return;
@@ -50,9 +52,9 @@ export default function ChooseRoleForm() {
   }, [nextPath, router, supabase]);
 
   const pick = (role: 'buyer' | 'seller') => {
+    setPicking(role);
     setActiveRole(role);
-    router.push(nextPath || destinationForRole(role));
-    router.refresh();
+    router.replace(nextPath || destinationForRole(role));
   };
 
   const roleLabel = (role: 'buyer' | 'seller') =>
@@ -78,9 +80,12 @@ export default function ChooseRoleForm() {
                 key={role}
                 type="button"
                 onClick={() => pick(role)}
-                className="w-full text-left p-5 rounded-lg border border-concrete-300 hover:border-rebar-600 hover:bg-rebar-50 transition-colors"
+                disabled={picking !== null}
+                className="w-full text-left p-5 rounded-lg border border-concrete-300 hover:border-rebar-600 hover:bg-rebar-50 transition-colors disabled:opacity-60"
               >
-                <span className="font-semibold block text-lg">{roleLabel(role).title}</span>
+                <span className="font-semibold block text-lg">
+                  {picking === role ? 'Opening…' : roleLabel(role).title}
+                </span>
                 <span className="text-sm text-graphite-600">{roleLabel(role).sub}</span>
               </button>
             ))}
