@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { sellerTypeLabel } from '@/lib/profile-types';
 import { sellerShopHref, type SellerProfile } from '@/lib/sellers';
