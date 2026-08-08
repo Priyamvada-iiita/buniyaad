@@ -2,7 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useTransition } from 'react';
+import { useEffect, useTransition, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { destinationForRole, getUserProfileRoles } from '@/lib/profiles';
+import { setActiveRole } from '@/lib/session-role';
 
 const LINKS = [
   { href: '/seller/profile', label: 'Shop profile', match: '/seller/profile' },
@@ -15,16 +18,31 @@ export default function SellerTabNav() {
   const pathname = usePathname();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [canSwitchToBuyer, setCanSwitchToBuyer] = useState(false);
 
   useEffect(() => {
     LINKS.forEach((link) => router.prefetch(link.href));
   }, [router]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session?.user) return;
+      const roles = await getUserProfileRoles(supabase, session.user.id);
+      setCanSwitchToBuyer(roles.includes('buyer'));
+    });
+  }, []);
 
   const navigate = (href: string) => {
     if (pathname === href || pathname?.startsWith(`${href}/`)) return;
     startTransition(() => {
       router.push(href);
     });
+  };
+
+  const switchToBuyer = () => {
+    setActiveRole('buyer');
+    router.replace(destinationForRole('buyer'));
   };
 
   return (
@@ -35,7 +53,7 @@ export default function SellerTabNav() {
         </div>
       ) : null}
       <div className="max-w-5xl mx-auto px-4">
-        <nav className="flex gap-1 overflow-x-auto py-2 -mb-px" aria-busy={isPending}>
+        <nav className="flex items-center gap-1 overflow-x-auto py-2 -mb-px" aria-busy={isPending}>
           {LINKS.map((link) => {
             const active = pathname === link.match || pathname?.startsWith(`${link.match}/`);
             return (
@@ -60,6 +78,15 @@ export default function SellerTabNav() {
               </Link>
             );
           })}
+          {canSwitchToBuyer ? (
+            <button
+              type="button"
+              onClick={switchToBuyer}
+              className="shrink-0 ml-auto px-4 py-2.5 text-sm font-semibold text-rebar-600 hover:text-rebar-700 hover:bg-rebar-50 rounded-md transition-colors whitespace-nowrap"
+            >
+              Switch to buyer
+            </button>
+          ) : null}
         </nav>
       </div>
     </div>

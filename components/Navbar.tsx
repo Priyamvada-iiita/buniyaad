@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import BilingualLabel from '@/components/BilingualLabel';
 import CartBadge from '@/components/CartBadge';
 import { destinationForRole, getUserProfileRoles } from '@/lib/profiles';
 import {
@@ -61,14 +60,13 @@ export default function Navbar({
   useEffect(() => {
     if (role) {
       setSessionRole(role);
-      return;
     }
 
     let cancelled = false;
 
     const applyRoles = async (userId: string) => {
       const stored = getActiveRole();
-      if (stored) setSessionRole(stored);
+      if (!role && stored) setSessionRole(stored);
 
       const roles = (await getUserProfileRoles(supabase, userId)).filter(
         (r): r is SessionRole => r === 'buyer' || r === 'seller'
@@ -76,23 +74,25 @@ export default function Navbar({
       if (cancelled) return;
 
       const currentPath = pathnameRef.current;
-      if (roles.length >= 2 && !stored && shopping && currentPath !== '/choose-role') {
+      if (!role && roles.length >= 2 && !stored && shopping && currentPath !== '/choose-role') {
         router.replace(`/choose-role?next=${encodeURIComponent(currentPath || '/catalog')}`);
         return;
       }
 
-      let active: SessionRole | null = null;
-      if (stored && roles.includes(stored)) {
-        active = stored;
-      } else if (roles.length === 1) {
-        active = roles[0];
-        setActiveRole(roles[0]);
-      } else if (stored) {
-        active = stored;
+      if (!role) {
+        let active: SessionRole | null = null;
+        if (stored && roles.includes(stored)) {
+          active = stored;
+        } else if (roles.length === 1) {
+          active = roles[0];
+          setActiveRole(roles[0]);
+        } else if (stored) {
+          active = stored;
+        }
+        if (active) setSessionRole(active);
       }
 
-      if (active) setSessionRole(active);
-
+      const active = role ?? (stored && roles.includes(stored) ? stored : roles.length === 1 ? roles[0] : stored);
       if (active) {
         const other = active === 'buyer' ? 'seller' : 'buyer';
         setSwitchRole(roles.includes(other) ? other : null);
@@ -169,10 +169,7 @@ export default function Navbar({
         ]
       : [];
 
-  const switchLabel =
-    switchRole === 'seller'
-      ? { primary: 'Switch to seller', secondary: 'Material bechna' }
-      : { primary: 'Switch to buyer', secondary: 'Material kharidna' };
+  const switchLabel = switchRole === 'seller' ? 'Switch to seller' : 'Switch to buyer';
 
   const desktopDownloadLink = (
     <Link
@@ -209,14 +206,9 @@ export default function Navbar({
             <button
               type="button"
               onClick={() => handleSwitchRole(switchRole)}
-              className="text-rebar-400 hover:text-rebar-300 text-left"
+              className="text-sm font-semibold text-rebar-400 hover:text-rebar-300 whitespace-nowrap"
             >
-              <BilingualLabel
-                primary={switchLabel.primary}
-                secondary={switchLabel.secondary}
-                primaryClassName="font-semibold text-sm"
-                secondaryClassName="text-xs text-rebar-300/90"
-              />
+              {switchLabel}
             </button>
           ) : null}
         </nav>
@@ -308,9 +300,9 @@ export default function Navbar({
             <button
               type="button"
               onClick={() => handleSwitchRole(switchRole)}
-              className="py-2.5 text-sm font-medium text-rebar-400 text-left"
+              className="py-2.5 text-sm font-semibold text-rebar-400 text-left"
             >
-              {switchLabel.primary} / {switchLabel.secondary}
+              {switchLabel}
             </button>
           ) : null}
 
