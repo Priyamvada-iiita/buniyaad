@@ -41,8 +41,13 @@ The site is already a PWA once deployed with the manifest.
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) (already have)
-- [Android Studio](https://developer.android.com/studio) — free
+- [Android Studio](https://developer.android.com/studio) — you have **Quail 3 | 2026.1.3**
 - JDK 17 (bundled with Android Studio)
+
+**First launch in Android Studio Quail:**
+1. Open Android Studio → complete setup wizard
+2. **More Actions → SDK Manager** → install **Android SDK** and **Android SDK Build-Tools**
+3. Accept licenses when prompted
 
 ### Steps
 
