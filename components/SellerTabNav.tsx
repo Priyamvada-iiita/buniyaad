@@ -6,6 +6,7 @@ import { useEffect, useTransition, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { destinationForRole, getUserProfileRoles } from '@/lib/profiles';
 import { setActiveRole } from '@/lib/session-role';
+import { cn } from '@/lib/cn';
 
 const LINKS = [
   { href: '/seller/profile', label: 'Shop profile', match: '/seller/profile' },
@@ -46,14 +47,14 @@ export default function SellerTabNav() {
   };
 
   return (
-    <div className="border-b border-concrete-200 bg-white relative">
+    <div className="site-subnav relative">
       {isPending ? (
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-rebar-500/30 overflow-hidden">
-          <div className="h-full w-1/3 bg-rebar-600 animate-[seller-tab-progress_0.9s_ease-in-out_infinite]" />
+        <div className="absolute inset-x-0 top-0 h-0.5 overflow-hidden bg-rebar-500/30">
+          <div className="h-full w-1/3 animate-seller-tab-progress bg-rebar-600" />
         </div>
       ) : null}
-      <div className="max-w-5xl mx-auto px-4">
-        <nav className="flex items-center gap-1 overflow-x-auto py-2 -mb-px" aria-busy={isPending}>
+      <div className="site-subnav-inner">
+        <nav className="-mb-px flex items-center gap-1 overflow-x-auto py-2" aria-busy={isPending}>
           {LINKS.map((link) => {
             const active = pathname === link.match || pathname?.startsWith(`${link.match}/`);
             return (
@@ -66,13 +67,14 @@ export default function SellerTabNav() {
                   navigate(link.href);
                 }}
                 aria-current={active ? 'page' : undefined}
-                className={`shrink-0 px-4 py-2.5 text-sm font-medium rounded-t-md border-b-2 transition-colors ${
+                className={cn(
+                  'shrink-0 rounded-t-md border-b-2 px-4 py-2.5 text-sm font-medium transition-colors',
                   active
-                    ? 'border-rebar-600 text-rebar-700 bg-rebar-50/50'
+                    ? 'border-rebar-600 bg-rebar-50/50 text-rebar-700'
                     : isPending
                     ? 'border-transparent text-graphite-400'
-                    : 'border-transparent text-graphite-600 hover:text-ink hover:bg-concrete-50'
-                }`}
+                    : 'border-transparent text-graphite-600 hover:bg-concrete-50 hover:text-ink'
+                )}
               >
                 {link.label}
               </Link>
@@ -82,7 +84,7 @@ export default function SellerTabNav() {
             <button
               type="button"
               onClick={switchToBuyer}
-              className="shrink-0 ml-auto px-4 py-2.5 text-sm font-semibold text-rebar-600 hover:text-rebar-700 hover:bg-rebar-50 rounded-md transition-colors whitespace-nowrap"
+              className="ml-auto shrink-0 whitespace-nowrap rounded-md px-4 py-2.5 text-sm font-semibold text-rebar-600 transition-colors hover:bg-rebar-50 hover:text-rebar-700"
             >
               Switch to buyer
             </button>

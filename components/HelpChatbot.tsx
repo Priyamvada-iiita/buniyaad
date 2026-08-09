@@ -98,7 +98,7 @@ export default function HelpChatbot() {
   return (
     <>
       {open ? (
-        <div className="fixed bottom-5 right-4 z-[60] w-[min(100vw-2rem,340px)] rounded-2xl border border-concrete-200 bg-white shadow-2xl flex flex-col overflow-hidden max-h-[min(72vh,520px)]">
+        <div className="fixed bottom-5 right-4 z-overlay w-full max-w-xs rounded-2xl border border-concrete-200 bg-white shadow-2xl flex flex-col overflow-hidden max-h-mobile-menu sm:max-w-sm">
           <div className="flex items-center justify-between px-4 py-3 border-b border-concrete-200 bg-ink text-white">
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rebar-600 text-sm">
@@ -106,7 +106,7 @@ export default function HelpChatbot() {
               </span>
               <div className="min-w-0">
                 <p className="font-semibold text-sm leading-tight">Buniyaad Help</p>
-                <p className="text-[10px] text-concrete-300 truncate">
+                <p className="text-2xs text-concrete-300 truncate">
                   {mode === 'ollama_with_faq_fallback' ? 'AI + FAQs' : 'Instant answers'}
                 </p>
               </div>
@@ -161,7 +161,7 @@ export default function HelpChatbot() {
                   type="button"
                   onClick={() => send(q)}
                   disabled={sending}
-                  className="shrink-0 text-[10px] px-2 py-1 rounded-full border border-concrete-200 bg-concrete-50 hover:bg-rebar-50 hover:border-rebar-200 text-graphite-700"
+                  className="shrink-0 text-2xs px-2 py-1 rounded-full border border-concrete-200 bg-concrete-50 hover:bg-rebar-50 hover:border-rebar-200 text-graphite-700"
                 >
                   {q}
                 </button>
@@ -195,7 +195,7 @@ export default function HelpChatbot() {
             e.preventDefault();
             setMinimizedPref(false);
           }}
-          className="fixed bottom-5 right-4 z-[60] h-12 w-12 rounded-full bg-rebar-600 text-white shadow-lg hover:bg-rebar-700 hover:shadow-xl transition-all flex items-center justify-center"
+          className="fixed bottom-5 right-4 z-overlay h-12 w-12 rounded-full bg-rebar-600 text-white shadow-lg hover:bg-rebar-700 hover:shadow-xl transition-all flex items-center justify-center"
           aria-label="Open Buniyaad help chat"
           title="Tap for help · Double-tap to show full button"
         >
@@ -210,7 +210,7 @@ export default function HelpChatbot() {
           </span>
         </button>
       ) : (
-        <div className="fixed bottom-5 right-4 z-[60] w-[min(calc(100vw-2rem),252px)] rounded-2xl border border-concrete-200 bg-white shadow-lg overflow-hidden">
+        <div className="fixed bottom-5 right-4 z-overlay w-full max-w-xs rounded-2xl border border-concrete-200 bg-white shadow-lg overflow-hidden sm:max-w-sm">
           <button
             type="button"
             onClick={() => setMinimizedPref(true)}

@@ -10,9 +10,50 @@
   body {
     @apply bg-concrete-50 text-ink;
   }
+
+  :root {
+    --site-header-height: 3.5rem;
+  }
+
+  @screen sm {
+    :root {
+      --site-header-height: 4rem;
+    }
+  }
 }
 
 @layer components {
+  /* Full-width fixed app header — reliable in mobile WebView (Capacitor) */
+  .site-header {
+    @apply fixed inset-x-0 top-0 z-header w-full border-b border-graphite-800 bg-ink text-concrete-50;
+  }
+
+  .site-header-bar {
+    @apply site-container flex h-14 sm:h-16 items-center gap-3;
+  }
+
+  .site-header-spacer {
+    height: var(--site-header-height);
+    @apply w-full shrink-0;
+  }
+
+  .site-container {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+
+  .site-subnav {
+    @apply sticky z-subnav w-full border-b border-concrete-200 bg-white;
+    top: var(--site-header-height);
+  }
+
+  .site-subnav-inner {
+    @apply site-container;
+  }
+
+  .animate-seller-tab-progress {
+    animation: seller-tab-progress 0.9s ease-in-out infinite;
+  }
+
   .btn-primary {
     @apply inline-flex items-center justify-center bg-rebar-600 hover:bg-rebar-700 text-white font-semibold px-5 py-2.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm;
   }

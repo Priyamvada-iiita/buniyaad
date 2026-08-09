@@ -42,6 +42,17 @@ module.exports = {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'monospace'],
       },
+      fontSize: {
+        '2xs': ['0.625rem', { lineHeight: '0.875rem' }],
+      },
+      zIndex: {
+        header: '50',
+        subnav: '40',
+        overlay: '60',
+      },
+      maxHeight: {
+        'mobile-menu': '70vh',
+      },
       boxShadow: {
         card: '0 1px 3px 0 rgb(28 27 25 / 0.06), 0 1px 2px -1px rgb(28 27 25 / 0.06)',
       },
