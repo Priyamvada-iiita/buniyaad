@@ -13,5 +13,7 @@ export function getAppUrl(): string {
 }
 
 export function apkDownloadUrl(): string {
-  return `${getAppUrl()}/downloads/buniyaad.apk`;
+  return `${getAppUrl()}/downloads/buniyaad-marketplace.apk`;
 }
+
+export const APK_FILENAME = 'buniyaad-marketplace.apk';

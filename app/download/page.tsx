@@ -12,7 +12,7 @@ export const metadata = {
 };
 
 export default function DownloadPage() {
-  const apkPath = path.join(process.cwd(), 'public', 'downloads', 'buniyaad.apk');
+  const apkPath = path.join(process.cwd(), 'public', 'downloads', 'buniyaad-marketplace.apk');
   const apkAvailable = existsSync(apkPath);
   const siteUrl = getAppUrl();
   const apkUrl = apkDownloadUrl();
@@ -42,8 +42,8 @@ export default function DownloadPage() {
                   Install the <strong>Buniyaad marketplace</strong> app on your Android phone.
                 </p>
                 <p className="text-xs text-graphite-500 mb-4">
-                  If you installed an older version and saw &quot;Buniyaad Academy&quot;, uninstall it first, then
-                  download again.
+                  Uninstall any old &quot;Buniyaad&quot; or &quot;Buniyaad Academy&quot; app first. This
+                  installs as <strong>Buniyaad Market</strong> (building materials).
                 </p>
                 <a
                   href={apkUrl}

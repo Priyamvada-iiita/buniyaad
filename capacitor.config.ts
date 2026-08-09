@@ -5,8 +5,8 @@ import { DEFAULT_APP_URL } from './lib/site-url';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || DEFAULT_APP_URL;
 
 const config: CapacitorConfig = {
-  appId: 'in.buniyaad.app',
-  appName: 'Buniyaad',
+  appId: 'in.buniyaad.marketplace',
+  appName: 'Buniyaad Market',
   webDir: 'public',
   server: {
     url: appUrl,
