@@ -1,6 +1,8 @@
 # Deploy Buniyaad for Client Demo
 
-Get a public URL like `https://buniyaad.vercel.app` so your client can try the app on phone/laptop.
+Get a public URL like `https://buniyaad-livid.vercel.app` so your client can try the app on phone/laptop.
+
+> **Do not use** `https://buniyaad.vercel.app` — that domain hosts a different project (Buniyaad Academy).
 
 ---
 
