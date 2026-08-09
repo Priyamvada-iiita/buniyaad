@@ -63,14 +63,14 @@ Website (Next.js on Vercel)
 Set in `.env.local` (and in Vercel project settings):
 
 ```env
-NEXT_PUBLIC_APP_URL=https://buniyaad.vercel.app
+NEXT_PUBLIC_APP_URL=https://buniyaad-livid.vercel.app
 ```
 
 Used by:
 - `capacitor.config.ts` → `server.url` for the APK WebView
 - Any absolute links that need the production domain
 
-Default fallback in config: `https://buniyaad.vercel.app`
+Default fallback in config: `https://buniyaad-livid.vercel.app` (do **not** use `buniyaad.vercel.app` — that domain is Buniyaad Academy, a different project).
 
 ---
 

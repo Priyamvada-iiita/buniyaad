@@ -1,7 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
+import { DEFAULT_APP_URL } from './lib/site-url';
 
-// Your live Vercel URL — set NEXT_PUBLIC_APP_URL in .env.local before building APK
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://buniyaad.vercel.app';
+// Set NEXT_PUBLIC_APP_URL in .env.local before `npx cap sync android`
+const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || DEFAULT_APP_URL;
 
 const config: CapacitorConfig = {
   appId: 'in.buniyaad.app',

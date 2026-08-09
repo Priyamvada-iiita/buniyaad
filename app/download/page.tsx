@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import { existsSync } from 'fs';
 import path from 'path';
+import { getAppUrl } from '@/lib/site-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,7 @@ export const metadata = {
 export default function DownloadPage() {
   const apkPath = path.join(process.cwd(), 'public', 'downloads', 'buniyaad.apk');
   const apkAvailable = existsSync(apkPath);
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://buniyaad.vercel.app';
+  const siteUrl = getAppUrl();
   const siteHost = siteUrl.replace(/^https?:\/\//, '');
 
   return (
